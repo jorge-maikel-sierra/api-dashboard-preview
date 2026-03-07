@@ -1,9 +1,27 @@
-const TABS = [
-  { id: "tools", label: "🛠 Stack de Herramientas" },
-  { id: "checklist", label: "✅ Checklist de Calidad" },
+const ALL_TABS = [
+  { id: "tools", label: "🛠 Stack de Herramientas", onlyFor: "nodejs" },
+  { id: "checklist", label: "✅ Checklist de Calidad", onlyFor: null },
 ];
 
-export function Header({ activeTab, onTabChange, total, done, pct, pctColor, sectionCount }) {
+export function Header({
+  activeTab,
+  onTabChange,
+  total,
+  done,
+  pct,
+  pctColor,
+  sectionCount,
+  courses,
+  activeCourse,
+  onCourseChange,
+  badge,
+  subtitle,
+}) {
+  // Filtrar tabs según el curso activo
+  const tabs = ALL_TABS.filter(
+    (t) => t.onlyFor === null || t.onlyFor === activeCourse
+  );
+
   return (
     <div
       style={{
@@ -13,6 +31,39 @@ export function Header({ activeTab, onTabChange, total, done, pct, pctColor, sec
       }}
     >
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
+
+        {/* Selector de cursos */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
+          {courses.map((c) => (
+            <button
+              key={c.id}
+              className="hov"
+              onClick={() => onCourseChange(c.id)}
+              style={{
+                padding: "5px 14px",
+                borderRadius: 20,
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "'Space Grotesk',sans-serif",
+                letterSpacing: "0.05em",
+                background:
+                  activeCourse === c.id
+                    ? "linear-gradient(135deg,#00D4FF33,#A78BFA33)"
+                    : "#111827",
+                color: activeCourse === c.id ? "#E2E8F0" : "#475569",
+                border:
+                  activeCourse === c.id
+                    ? "1px solid #00D4FF55"
+                    : "1px solid #1E293B",
+                transition: "all 0.2s",
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
         {/* Title row */}
         <div
           style={{
@@ -36,7 +87,7 @@ export function Header({ activeTab, onTabChange, total, done, pct, pctColor, sec
                 marginBottom: 8,
               }}
             >
-              REST API · Node.js · PostgreSQL
+              {badge}
             </div>
             <div
               style={{
@@ -50,7 +101,7 @@ export function Header({ activeTab, onTabChange, total, done, pct, pctColor, sec
               Project Blueprint
             </div>
             <div style={{ color: "#64748B", fontSize: 12, marginTop: 4 }}>
-              Stack completo · Checklist de calidad · {sectionCount} categorías · {total} tareas
+              {subtitle} · {sectionCount} categorías · {total} tareas
             </div>
           </div>
 
@@ -113,7 +164,7 @@ export function Header({ activeTab, onTabChange, total, done, pct, pctColor, sec
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 4, marginTop: 20 }}>
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               className="hov"

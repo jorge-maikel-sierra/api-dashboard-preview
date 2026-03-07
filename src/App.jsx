@@ -1,13 +1,47 @@
 import { useState } from "react";
-import { useChecklist } from "./hooks/useChecklist";
+import { useChecklistByData } from "./hooks/useChecklistByData";
 import { Header } from "./components/Header";
 import { ToolsTab } from "./components/ToolsTab";
 import { ChecklistTab } from "./components/ChecklistTab";
 import { checklist } from "./data/checklist";
+import { checklistReact } from "./data/checklist-react";
+
+// Catálogo de cursos disponibles
+const COURSES = [
+  {
+    id: "nodejs",
+    label: "Node.js API",
+    badge: "REST API · Node.js · PostgreSQL",
+    subtitle: "Stack completo · Checklist de calidad",
+    data: checklist,
+    showTools: true,
+  },
+  {
+    id: "react",
+    label: "React / Next.js",
+    badge: "React · Next.js · The Odin Project",
+    subtitle: "Checklist del curso",
+    data: checklistReact,
+    showTools: false,
+  },
+];
 
 export default function App() {
+  const [activeCourse, setActiveCourse] = useState("nodejs");
   const [activeTab, setActiveTab] = useState("tools");
-  const checklistState = useChecklist();
+
+  const course = COURSES.find((c) => c.id === activeCourse);
+  const checklistState = useChecklistByData(course.data);
+
+  // Si el curso activo no tiene pestaña de Tools, forzar checklist
+  const resolvedTab = !course.showTools && activeTab === "tools" ? "checklist" : activeTab;
+
+  const handleCourseChange = (courseId) => {
+    setActiveCourse(courseId);
+    const newCourse = COURSES.find((c) => c.id === courseId);
+    if (!newCourse.showTools) setActiveTab("checklist");
+    else setActiveTab("tools");
+  };
 
   return (
     <div
@@ -31,19 +65,26 @@ export default function App() {
       `}</style>
 
       <Header
-        activeTab={activeTab}
+        activeTab={resolvedTab}
         onTabChange={setActiveTab}
         total={checklistState.total}
         done={checklistState.done}
         pct={checklistState.pct}
         pctColor={checklistState.pctColor}
-        sectionCount={checklist.length}
+        sectionCount={course.data.length}
+        courses={COURSES}
+        activeCourse={activeCourse}
+        onCourseChange={handleCourseChange}
+        showTools={course.showTools}
+        badge={course.badge}
+        subtitle={course.subtitle}
       />
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "28px 32px" }}>
-        {activeTab === "tools" && <ToolsTab />}
-        {activeTab === "checklist" && (
+        {resolvedTab === "tools" && course.showTools && <ToolsTab />}
+        {resolvedTab === "checklist" && (
           <ChecklistTab
+            data={course.data}
             toggle={checklistState.toggle}
             toggleSection={checklistState.toggleSection}
             isSectionOpen={checklistState.isSectionOpen}

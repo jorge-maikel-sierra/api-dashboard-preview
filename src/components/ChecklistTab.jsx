@@ -1,5 +1,3 @@
-import { checklist } from "../data/checklist";
-
 function ChecklistItem({ item, isChecked, color, onToggle }) {
   return (
     <div
@@ -153,15 +151,15 @@ function ChecklistSection({ section, si, toggle, toggleSection, isSectionOpen, i
   );
 }
 
-export function ChecklistTab({ toggle, toggleSection, isSectionOpen, isItemChecked, total }) {
+export function ChecklistTab({ data, toggle, toggleSection, isSectionOpen, isItemChecked, total }) {
   return (
     <div>
       <p style={{ color: "#64748B", fontSize: 12, marginBottom: 20 }}>
-        Haz click en cada tarea para marcarla. {checklist.length} categorías ·{" "}
+        Haz click en cada tarea para marcarla. {data.length} categorías ·{" "}
         {total} tareas en total.
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {checklist.map((section, si) => (
+        {data.map((section, si) => (
           <ChecklistSection
             key={si}
             section={section}
